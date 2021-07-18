@@ -8,8 +8,7 @@
     "discord-webhook-node": "^1.1.8",
     "ethers": "^5.4.1",
     "fs": "^0.0.1-security",
-    "util": "^0.12.4",
-    "web3": "^1.4.0"
+    "util": "^0.12.4"
   },
   "devDependencies": {},
   "scripts": {

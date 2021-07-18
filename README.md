@@ -1,4 +1,5 @@
 # defi-auto-farm
+## autoclaim for degen-defi farms
 
 1. Rename creds.sample.js to creds.js and fill in your data
 2. copy config.sample.js and fill it out so it fits your farm & place it in a folder

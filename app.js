@@ -33,7 +33,7 @@ if (config.targetToken.address == undefined) {
 
 const claimInterval = config.interval;
 console.log(`[!!] Claim interval ${claimInterval}min`)
-const Contract = require("./libs/contract_ethers.js")(privateConfig.polygonscan);
+const Contract = require("./libs/contract_ethers.js")(privateConfig.polygonscan,config.chainId || 137);
 const discordHook = privateConfig.discordWebHook !== undefined ? new Webhook(privateConfig.discordWebHook) : false;
 //Specifics
 const MIN_CONFIRMATIONS = config.min_confirmations;

@@ -6,7 +6,8 @@ const writeFile = util.promisify(fs.writeFile)
 const readFile = util.promisify(fs.readFile);
 
 
-module.exports = (API_KEY) => {
+module.exports = (API_KEY,chain_id) => {
+
     var ABI_CACHE = [];
     async function ContractABI(address) {
         if (ABI_CACHE[address]) return ABI_CACHE[address];

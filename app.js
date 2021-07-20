@@ -33,7 +33,7 @@ if (config.targetToken.address == undefined) {
 
 const claimInterval = config.interval;
 console.log(`[!!] Claim interval ${claimInterval}min`)
-const Contract = require("./libs/contract_ethers.js")(privateConfig.polygonscan,config.chainId || 137);
+const Contract = require("./libs/contract_ethers.js")(privateConfig.blockexplorer, config.chainId);
 const discordHook = privateConfig.discordWebHook !== undefined ? new Webhook(privateConfig.discordWebHook) : false;
 //Specifics
 const MIN_CONFIRMATIONS = config.min_confirmations;
@@ -51,7 +51,7 @@ const provider = (RPC_URL.indexOf("wss://") == -1) ? new ethers.providers.JsonRp
 
 let wallet = new ethers.Wallet(privateConfig.privateKey)
 wallet = wallet.connect(provider);
-const Token = require("./libs/token.js")(privateConfig.polygonscan, wallet, provider, MIN_CONFIRMATIONS, chainId);
+const Token = require("./libs/token.js")(privateConfig.blockexplorer, wallet, provider, MIN_CONFIRMATIONS, chainId);
 var txConfirmations = [];
 
 var LOOP_BUSY =
@@ -72,6 +72,7 @@ var LOOP_BUSY =
         console.log("[!] Target Token")
         console.table({ symbol: TargetTokenName, base: FormatBasis })
 
+
         console.log(`[!!] Farm Token`)
         console.table({ symbol: TokenFarmName })
         const poolInfo = await MasterChefInterface.poolInfo(POOL_ID);
@@ -79,6 +80,7 @@ var LOOP_BUSY =
         console.log("[?] Max Slippage", SLIPPAGE + "%")
         const claimReward = async () => {
             const fastGas = await provider.getGasPrice();
+
             const beforeClaimBalance = await TokenInterface.balanceOf(address);
             console.log("[!] Before ClaimReward", formatEther(beforeClaimBalance))
 
@@ -95,11 +97,13 @@ var LOOP_BUSY =
                         console.log("[!] Claiming Reward")
                         const gas = {
                             gasLimit: BN.from("10000000"),
-                            gasPrice: fastGas.mul(FeeMultiplier),
+                            gasPrice: fastGas.mul(FeeMultiplier),//5000050010
 
                         };
                         console.table({ gasLimit: gas.gasLimit.toString(), gasPrice: gas.gasPrice.toString() })
+
                         try {
+
                             if (config.claimFunctionFormat == undefined) {
                                 config.claimFunctionFormat = (pool, address) => {
                                     return [pool, 0]
@@ -107,6 +111,8 @@ var LOOP_BUSY =
                             }
                             const d = config.claimFunctionFormat(POOL_ID, address);
                             const reward = await MasterChefInterface[config.claimFunction](...d, gas);
+
+
 
                             console.log(`[!] Claim ${reward.hash}`)
                             await reward.wait(MIN_CONFIRMATIONS);
@@ -118,6 +124,7 @@ var LOOP_BUSY =
                         } catch (error) {
                             return console.error("[!] Claim error", error);
                         }
+
                     }
                     const balance = await TokenInterface.balanceOf(address);
                     console.log("[!] New Balance", formatEther(balance))
@@ -125,7 +132,7 @@ var LOOP_BUSY =
                     if (!balance.gt(0)) throw Error("[!] Balance 0")
                     const swap = await Token.swapTokenForToken(config.farmToken.address, config.farmToken.proxy, config.targetToken.address, balance, {
                         gasLimit: BN.from("10000000"),
-                        gasPrice: fastGas.mul(FeeMultiplier),
+                        gasPrice: fastGas.mul(FeeMultiplier),//5000050010
                     }, SLIPPAGE);
                     if (!swap) throw Error("[?] Swap Failed");
                     const msg = `[!] Swapped ${Number(formatEther(swap.agg.fromTokenAmount)).toFixed(6)} ${TokenFarmName} to ${formatCustom(swap.agg.toTokenAmount, FormatBasis)} ${TargetTokenName} TX:${swap.tx.hash}`;

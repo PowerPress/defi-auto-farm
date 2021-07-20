@@ -1,6 +1,6 @@
 const ethers = require('ethers');
 const BN = ethers.BigNumber;
-const { formatEther } = ethers.utils;
+const { formatEther, formatUnits } = ethers.utils;
 const { WeiPerEther } = ethers.constants;
 const {
     Webhook
@@ -80,28 +80,31 @@ var LOOP_BUSY =
         console.log("[?] Max Slippage", SLIPPAGE + "%")
         const claimReward = async () => {
             const fastGas = await provider.getGasPrice();
+            const multipliedGas = BN.from(config.maxGasPrice ? Math.min(fastGas.mul(FeeMultiplier), config.maxGasPrice) : fastGas.mul(FeeMultiplier));
 
             const beforeClaimBalance = await TokenInterface.balanceOf(address);
             console.log("[!] Before ClaimReward", formatEther(beforeClaimBalance))
-
+            
             const userInfo = await MasterChefInterface.userInfo(POOL_ID, address);
             console.log("[!] rewardDebt", formatEther(userInfo.rewardDebt.toString()))
             console.log("[!] Staked", formatEther(userInfo.amount.toString()))
 
             const pendingReward = await MasterChefInterface[config.checkPending](POOL_ID, address);
             console.log("[!] pendingReward", formatEther(pendingReward))
-            if (pendingReward.gt(0) || beforeClaimBalance.gt(WeiPerEther.div(100))) {
+            
+            console.log("[!] est. gas price", formatUnits(fastGas, "gwei"));
+            if (config.maxGasPrice && fastGas > config.maxGasPrice) {
+                console.log("[!] Gas price is too high, skipping");
+            }
+            else if (pendingReward.gt(0) || beforeClaimBalance.gt(WeiPerEther.div(100))) {
                 try {
                     if (pendingReward.gt(0)) {
-                        console.log("[!] est. gas price", fastGas.toString())
                         console.log("[!] Claiming Reward")
                         const gas = {
                             gasLimit: BN.from("10000000"),
-                            gasPrice: fastGas.mul(FeeMultiplier),//5000050010
-
+                            gasPrice: multipliedGas
                         };
-                        console.table({ gasLimit: gas.gasLimit.toString(), gasPrice: gas.gasPrice.toString() })
-
+                        console.table({ gasLimit: gas.gasLimit.toString(), gasPrice: formatUnits(gas.gasPrice, "gwei") + " gwei" })
                         try {
 
                             if (config.claimFunctionFormat == undefined) {
@@ -132,7 +135,7 @@ var LOOP_BUSY =
                     if (!balance.gt(0)) throw Error("[!] Balance 0")
                     const swap = await Token.swapTokenForToken(config.farmToken.address, config.farmToken.proxy, config.targetToken.address, balance, {
                         gasLimit: BN.from("10000000"),
-                        gasPrice: fastGas.mul(FeeMultiplier),//5000050010
+                        gasPrice: multipliedGas,
                     }, SLIPPAGE);
                     if (!swap) throw Error("[?] Swap Failed");
                     const msg = `[!] Swapped ${Number(formatEther(swap.agg.fromTokenAmount)).toFixed(6)} ${TokenFarmName} to ${formatCustom(swap.agg.toTokenAmount, FormatBasis)} ${TargetTokenName} TX:${swap.tx.hash}`;

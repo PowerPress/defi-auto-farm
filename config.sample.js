@@ -17,7 +17,9 @@ module.exports = {
     claimFunction: "withdraw",// function to claim reward (POOLID,0)
     claimFunctionFormat: (poolid, address) => {
         return [poolid, address] //format the claimFunction should be called with (deconstructs the array later)
-    }
+    },
+    feeMul: 2, // multiplies gas fee
+    maxGasPrice: 0 // maximum gas price in wei (0, undefined or false for no limit)
 
 
 }

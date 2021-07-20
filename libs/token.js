@@ -5,10 +5,7 @@ const axios = require('axios');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 module.exports = function (API_KEY, wallet, provider, MIN_CONFIRMATIONS, chain_id) {
-
-
-    const Contract = require("./contract_ethers.js")(API_KEY,chain_id);
-
+    const Contract = require("./contract_ethers.js")(API_KEY, chain_id);
     const prettifyTx = (txData) => {
         return {
             nonce: txData.nonce,

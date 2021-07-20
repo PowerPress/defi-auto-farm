@@ -5,9 +5,13 @@ const ethers = require('ethers');
 const writeFile = util.promisify(fs.writeFile)
 const readFile = util.promisify(fs.readFile);
 
+const scanOptions = {
+    137: "https://api.polygonscan.com/",
+    56: "https://api.bscscan.com/",
+    2: "https://api.etherscan.io/",
+}
 
-module.exports = (API_KEY,chain_id) => {
-
+module.exports = (API_KEY, chain_id) => {
     var ABI_CACHE = [];
     async function ContractABI(address) {
         if (ABI_CACHE[address]) return ABI_CACHE[address];
@@ -20,7 +24,7 @@ module.exports = (API_KEY,chain_id) => {
                 return contractAbi;
             } else {
                 console.log(`[!] Loading ABI of ${address} from Chain`)
-                let url = `https://api.polygonscan.com/api?module=contract&action=getabi&address=${address}&apikey=${API_KEY}`
+                let url = `${scanOptions[chain_id]}/api?module=contract&action=getabi&address=${address}&apikey=${API_KEY}`
                 const response = await axios.get(url);
 
                 if (response.data.status == '1') {
@@ -28,6 +32,8 @@ module.exports = (API_KEY,chain_id) => {
                     ABI_CACHE[address] = JSON.parse(response.data.result);
                     return ABI_CACHE[address];
                 }
+                console.log(response);
+                return false;
             }
         } catch (error) {
             console.log("error", error);

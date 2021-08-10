@@ -1,6 +1,6 @@
 
 const ethers = require('ethers');
-const { formatEther, hexlify } = ethers.utils;
+const { formatEther, formatUnits } = ethers.utils;
 const axios = require('axios');
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -21,7 +21,7 @@ module.exports = function (API_KEY, wallet, provider, MIN_CONFIRMATIONS, chain_i
         }
     }
     var allowanceCache = [];
-    const approve = async (contract_address, contract_proxy_address = false, address, amount) => {
+    const approve = async (contract_address, contract_proxy_address = false, address, amount, customGas) => {
         try {
             console.log("[?] approve", contract_address);
             if (allowanceCache[contract_address + "_" + address] && allowanceCache[contract_address + "_" + address].gte(amount)) {
@@ -41,18 +41,12 @@ module.exports = function (API_KEY, wallet, provider, MIN_CONFIRMATIONS, chain_i
             }
 
             const newAllowance = amount.mul(5000).div(100);
-            let gasLimit = await tContract.estimateGas.approve(address, newAllowance);
-            let gasPrice = await provider.getGasPrice();
 
-            console.table({ "gasPrice": gasPrice.mul(2).toNumber(), "gasLimit": gasLimit.mul(2).toNumber() })
+            console.table({ "gasPrice": formatUnits(customGas.gasPrice, "gwei") + " gwei", "gasLimit": customGas.gasLimit.toNumber() })
             const tx = await tContract.approve(
                 address,
                 newAllowance,
-                {
-                    gasPrice: gasPrice.mul(2),
-                    gasLimit: gasLimit.mul(2),
-                    //chainId: chain_id
-                }
+                customGas
             );
             //console.log("tx", tx)
             console.log("[!] Waiting for confirmations on approval", tx.hash);
@@ -119,7 +113,7 @@ module.exports = function (API_KEY, wallet, provider, MIN_CONFIRMATIONS, chain_i
         let agg = await getRoute(tokenIn, tokenOut, amountTokenIn, slippage);//await axios.get(url);
 
         let spender = await getSpender();
-        const approved = await approve(tokenIn, tokenInProxy, spender.address, amountTokenIn);
+        const approved = await approve(tokenIn, tokenInProxy, spender.address, amountTokenIn, customGas);
         if (agg && approved) {
             let data = agg.tx;
             delete data.gasPrice;
@@ -127,7 +121,7 @@ module.exports = function (API_KEY, wallet, provider, MIN_CONFIRMATIONS, chain_i
             data.value = "0x0";
             //data.chainId = chain_id;
             if (customGas) {
-                console.table({ "gasPrice": customGas.gasPrice.toNumber(), "gasLimit": customGas.gasLimit.toNumber() })
+                console.table({ "gasPrice": formatUnits(customGas.gasPrice, "gwei") + " gwei", "gasLimit": customGas.gasLimit.toNumber() })
                 Object.assign(data, customGas)
             }
             console.log("[!] Sending Swap to 1inch")

@@ -28,6 +28,9 @@ module.exports = (API_KEY, chain_id) => {
                 const response = await axios.get(url);
 
                 if (response.data.status == '1') {
+                    if (!fs.existsSync('./contracts')) {
+                        fs.mkdirSync('./contracts');
+                    }
                     await writeFile(`./contracts/${address}.abi`, response.data.result)
                     ABI_CACHE[address] = JSON.parse(response.data.result);
                     return ABI_CACHE[address];

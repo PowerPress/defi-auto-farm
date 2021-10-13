@@ -5,7 +5,7 @@ module.exports = {
         proxy: "0xdd9185db084f5c4fff3b4f70e7ba62123b812226" //usdc proxy
     },
     min_confirmations: 2, //minimum confirmations to wait for
-    interval: 25, //claim interval in minutes
+    maxGasPrice: 25, //max gas price to pay
     chainId: 137, // chain id, 137 for polygon
     slippage: 15, //slippage in %
     pool_id: 3, //pool you want to claim from

@@ -8,11 +8,11 @@ module.exports = {
     interval: 15,
     chainId: 137,
     slippage: 15,
-    pool_id: 5,
-    farmToken: { address: "0x4c19ddeebaf84ca3a255730295ad9d824d4ff51f", proxy: false },
-    farmMasterChef: "0x62ba727e2449ee3be0573b4b102d7090c5977bfb",
-    checkPending: "pendingWise",
-    claimFunction: "withdraw",
+    pool_id: 8,
+    farmToken: { address: "0x600a2c125b501e0a477e2c4ad0d9d51c0d6df813", proxy: false },
+    farmMasterChef: "0xea1A9Dce0807c5488C8f943b9e571e2b2b680bca",
+    checkPending: "pendingToken",
+    claimFunction: "withdrawFunds",
     claimFunctionFormat: (poolid, address) => {
         return [poolid, 0]
     }

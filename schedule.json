@@ -1,0 +1,7 @@
+[
+	{
+		"farm": "./farm",
+		"account": "./creds",
+		"interval":30
+	}
+]

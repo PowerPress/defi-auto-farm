@@ -7,13 +7,13 @@ module.exports = {
     min_confirmations: 2,
     interval: 15,
     chainId: 137,
-    slippage: 15,
+    slippage: 25,
     pool_id: 5,
-    farmToken: { address: "0x4c19ddeebaf84ca3a255730295ad9d824d4ff51f", proxy: false },
-    farmMasterChef: "0x62ba727e2449ee3be0573b4b102d7090c5977bfb",
-    checkPending: "pendingWise",
-    claimFunction: "withdraw",
+    farmToken: { address: "0x0b502860b730bfaf5fa5566ec9996c53810dfe08", proxy: false },
+    farmMasterChef: "0x36caee4b022f5a0f5ce31fdb7fdf45498e8b2678",
+    checkPending: "pendingSh",
+    claimFunction: "claim",
     claimFunctionFormat: (poolid, address) => {
-        return [poolid, 0]
+        return [poolid]
     }
 }

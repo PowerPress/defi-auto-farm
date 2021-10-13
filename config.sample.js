@@ -4,8 +4,6 @@ module.exports = {
         address: "0x2791bca1f2de4661ed88a30c99a7a9449aa84174", //usdc
         proxy: "0xdd9185db084f5c4fff3b4f70e7ba62123b812226" //usdc proxy
     },
-    
-    feeMul: 5,
     min_confirmations: 2, //minimum confirmations to wait for
     interval: 25, //claim interval in minutes
     chainId: 137, // chain id, 137 for polygon
@@ -17,9 +15,7 @@ module.exports = {
     claimFunction: "withdraw",// function to claim reward (POOLID,0)
     claimFunctionFormat: (poolid, address) => {
         return [poolid, address] //format the claimFunction should be called with (deconstructs the array later)
-    },
-    feeMul: 2, // multiplies gas fee
-    maxGasPrice: 0 // maximum gas price in wei (0, undefined or false for no limit)
+    }
 
 
 }
